@@ -5,7 +5,7 @@ exports.formatDates = list => {
     listCopy.forEach(element => {
                 let timestamp = new Date(element.created_at)
                 let formattedDate = timestamp.toJSON().toString();
-                formattedDate = formattedDate.replace('T', ' ')
+                formattedDate = formattedDate.replace('T', ' ').slice(0, 19)+'-'+formattedDate.slice(20,22)
                 console.log(formattedDate)
               element.created_at = formattedDate;
         });

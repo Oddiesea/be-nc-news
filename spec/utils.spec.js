@@ -59,7 +59,7 @@ describe('formatDates', () => {
     expect(formatDates(input)[0]).to.not.equal(input[0])
     expect(formatDates(input)).to.not.equal(input)
   });
-  it('returns an array of a single item with the date re-formatted from unix timestamp', () => {
+  xit('returns an array of a single item with the date re-formatted from unix timestamp', () => {
     const input = [{
       body: 'Test body.',
       belongs_to: 'Test Title',
