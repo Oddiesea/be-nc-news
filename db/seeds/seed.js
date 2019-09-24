@@ -7,6 +7,8 @@ const {
 
 const { formatDates, formatComments, makeRefObj } = require("../utils/utils");
 
+const notTest = process.env.NODE_ENV === "test" ? false : true;
+
 exports.seed = function(connection) {
   return connection.migrate
     .rollback()
@@ -17,9 +19,10 @@ exports.seed = function(connection) {
 
       return Promise.all([topicsInsertions, usersInsertions])
         .then(enteredRows => {
-          console.log(
-            `inserted ${enteredRows[0].length} into the topics table\ninserted ${enteredRows[1].length} into the users table`
-          );
+          if (notTest)
+            console.log(
+              `inserted ${enteredRows[0].length} into the topics table\ninserted ${enteredRows[1].length} into the users table`
+            );
 
           //correct date format then insert into table
           const formattedArticleData = formatDates(articleData);
@@ -27,7 +30,10 @@ exports.seed = function(connection) {
           return connection("articles").insert(formattedArticleData, "*");
         })
         .then(articleRows => {
-          console.log(`inserted ${articleRows.length} into the articles table`);
+          if (notTest)
+            console.log(
+              `inserted ${articleRows.length} into the articles table`
+            );
 
           //correct date format
           const formattedCommentData = formatDates(commentData);
@@ -37,10 +43,11 @@ exports.seed = function(connection) {
             articlesRef
           );
 
-          return connection("comments").insert(formattedComments, '*');
+          return connection("comments").insert(formattedComments, "*");
         })
         .then(commentRows => {
-          console.log(`inserted ${commentRows.length} into comments table`);
+          if (notTest)
+            console.log(`inserted ${commentRows.length} into comments table`);
         });
     });
 };
