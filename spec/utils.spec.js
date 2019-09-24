@@ -201,8 +201,8 @@ describe.only("formatComments", () => {
     ];
     const refObj = { "Test Title": 2};
     const actual = formatComments(input, refObj);
-    const expected = [{ article_id: 2}]
-    expect(actual).to.eql(expected);
+    expect(actual[0].article_id).to.equal(2);
+    expect(actual[0].belongs_to).to.equal(undefined)
   });
   it('passes the same test as above with serval objects in an array', () => {
     const input = [
@@ -210,8 +210,9 @@ describe.only("formatComments", () => {
     ];
     const refObj = { "Test Title": 2,"Test Title 2":10,"Test Title 3": 20};
     const actual = formatComments(input, refObj);
-    const expected = [{ article_id: 2}, {article_id:10}, {article_id:20},]
-    expect(actual).to.eql(expected);
+    expect(actual[0].article_id).to.equal(2);
+    expect(actual[1].article_id).to.equal(10);
+    expect(actual[2].article_id).to.equal(20);
   });
   it("also replaces the 'created_by' key with the authour key and copies the value", () => {
     const input = [

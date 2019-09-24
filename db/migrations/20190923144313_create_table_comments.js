@@ -4,7 +4,6 @@ exports.up = function(connection) {
       comments.increments("comment_id").primary();
       comments.string("author").references("users.username");
       comments.integer("article_id").references("articles.article_id").notNullable();
-      comments.string("title").notNullable();
       comments.integer("votes").defaultTo(0);
       comments.timestamp("created_at").notNullable();
       comments.text("body").notNullable();
