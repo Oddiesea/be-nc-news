@@ -9,13 +9,24 @@ exports.formatDates = list => {
   return listCopy;
 };
 
-exports.makeRefObj = (list, keyName, valueName) => {
+exports.makeRefObj = list => {
   const refObj = {};
-  if (!keyName || !valueName) return refObj;
+  if (list.length === 0) return refObj;
   list.forEach(element => {
-    refObj[element[keyName]] = element[valueName];
+    refObj[element.title] = element.article_id;
   });
   return refObj;
 };
 
-exports.formatComments = (comments, articleRef) => {};
+exports.formatComments = (comments, articleRef) => {
+  if (comments.length === 0 || Object.entries(articleRef).length === 0)
+    return [];
+  const formattedComments = _.cloneDeep(comments);
+  formattedComments.forEach(element => {
+    element.author = element.created_by;
+    element.article_id = articleRef[element.belongs_to];
+    delete element.belongs_to;
+    delete element.created_by;
+  });
+  return formattedComments;
+};
