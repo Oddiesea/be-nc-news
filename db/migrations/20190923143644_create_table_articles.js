@@ -15,7 +15,7 @@ exports.up = function(connection) {
       .string("author")
       .references("users.username")
       .notNullable();
-    articles.timestamp("created_at").notNullable();
+    articles.timestamp("created_at").defaultTo("NOW");
   });
 };
 

@@ -4,13 +4,13 @@ exports.up = function(connection) {
   return connection.schema.createTable("comments", comments => {
     if (notTest) console.log("creating comments table");
     comments.increments("comment_id").primary();
-    comments.string("author").references("users.username");
+    comments.string("author").references("users.username").notNullable();
     comments
       .integer("article_id")
       .references("articles.article_id")
       .notNullable();
     comments.integer("votes").defaultTo(0);
-    comments.timestamp("created_at").notNullable();
+    comments.timestamp("created_at").defaultTo("NOW");
     comments.text("body").notNullable();
   });
 };

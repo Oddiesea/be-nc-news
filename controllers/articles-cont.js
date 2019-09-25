@@ -1,9 +1,9 @@
-const { getArticleById, patchArticleVotes } = require("../models/articles-mod");
+const { getArticles, patchArticleVotes } = require("../models/articles-mod");
 
 exports.requestArticleById = (req, res, next) => {
   const { article_id } = req.params;
-  getArticleById(article_id)
-    .then(articleData => {
+  getArticles(req)
+    .then(([articleData]) => {
       res.status(200).send(articleData);
     })
     .catch(next);
@@ -22,4 +22,12 @@ exports.updateArticleVotes = (req, res, next) => {
         res.status(200).send(articleData);
       })
       .catch(next);
+};
+
+exports.requestAllArticles = (req, res, next) => {
+  getArticles(req)
+    .then(articleData => {
+      res.status(200).send(articleData);
+    })
+    .catch(next);
 };
