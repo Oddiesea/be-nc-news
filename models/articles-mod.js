@@ -19,7 +19,6 @@ exports.getArticles = ({
     .then(articleData => {
       if (articleData.length === 0) {
         if (author) {
-          //checking if author exists
           return connection("users")
             .select("*")
             .where("username", author)

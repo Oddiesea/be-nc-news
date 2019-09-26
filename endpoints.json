@@ -23,5 +23,92 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "returns an object containing article data",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Running a Node App",
+        "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
+        "votes": 0,
+        "topic": "coding",
+        "author": "jessjelly",
+        "created_at": "2016-08-18T12:07:52.389Z",
+        "comment_count": "8"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates votes value of an article when passed object in the form { vote_inc: 999}",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Running a Node App",
+        "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
+        "votes": 999,
+        "topic": "coding",
+        "author": "jessjelly",
+        "created_at": "2016-08-18T12:07:52.389Z",
+        "comment_count": "8"
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "returns an object containing an array of comment objects relating to an article",
+    "queries": ["sort_by","order"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 70,
+          "votes": 2,
+          "created_at": "2018-01-29T06:21:22.610Z",
+          "body": "Et ullam nihil repudiandae facere sunt cupiditate cum.",
+          "author": "grumpy19"
+        },
+        {
+          "comment_id": 146,
+          "votes": 6,
+          "created_at": "2018-01-03T22:36:49.051Z",
+          "body": "Soluta autem fuga non alias. Odit eligendi voluptas reiciendis repudiandae.",
+          "author": "jessjelly"
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "returns the comment posted in an object",
+    "queries": [],
+    "exampleResponse": {
+      "comment":
+        {
+          "comment_id": 70,
+          "votes": 2,
+          "created_at": "2018-01-29T06:21:22.610Z",
+          "body": "Et ullam nihil repudiandae facere sunt cupiditate cum.",
+          "author": "grumpy19"
+        }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the votes of an a comment when passed object in the form { vote_inc: 999}",
+    "queries": [],
+    "exampleResponse": {
+      "comment":
+        {
+          "comment_id": 70,
+          "votes": 1001,
+          "created_at": "2018-01-29T06:21:22.610Z",
+          "body": "Et ullam nihil repudiandae facere sunt cupiditate cum.",
+          "author": "grumpy19"
+        }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the referenced comment",
+    "queries": [],
+    "exampleResponse": "N/A"
   }
 }

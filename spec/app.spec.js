@@ -104,7 +104,7 @@ describe("/api", () => {
             .get("/api/articles/1")
             .expect(200)
             .then(({ body }) => {
-              expect(body).to.eql({
+              expect(body.article).to.eql({
                 article_id: 1,
                 title: "Living in the shadow of a great man",
                 topic: "mitch",
@@ -140,7 +140,7 @@ describe("/api", () => {
             .send({ inc_votes: 999 })
             .expect(200)
             .then(({ body }) => {
-              expect(body).to.eql({
+              expect(body.article).to.eql({
                 article_id: 3,
                 title: "Eight pug gifs that remind me of mitch",
                 topic: "mitch",
@@ -157,7 +157,7 @@ describe("/api", () => {
             .send({ inc_votes: -999 })
             .expect(200)
             .then(({ body }) => {
-              expect(body).to.eql({
+              expect(body.article).to.eql({
                 article_id: 3,
                 title: "Eight pug gifs that remind me of mitch",
                 topic: "mitch",
@@ -215,7 +215,7 @@ describe("/api", () => {
               .send({ username: "butter_bridge", body: "This is a test body." })
               .expect(201)
               .then(({ body }) => {
-                expect(body).to.contain.keys(
+                expect(body.comment).to.contain.keys(
                   "comment_id",
                   "author",
                   "article_id",
@@ -223,8 +223,8 @@ describe("/api", () => {
                   "created_at",
                   "body"
                 );
-                expect(body.comment_id).to.equal(19);
-                expect(body.author).to.equal("butter_bridge");
+                expect(body.comment.comment_id).to.equal(19);
+                expect(body.comment.author).to.equal("butter_bridge");
               });
           });
           it("Status 400: returns error when passed an object without the correct keys", () => {
@@ -264,7 +264,7 @@ describe("/api", () => {
                   username: "fake_user123",
                   body: "This is a test body."
                 })
-                // .expect(422)
+                .expect(422)
                 .then(({ body }) => {
                   expect(body).to.eql({
                     msg: "Unprocessable entity , references non-existent item"
@@ -279,7 +279,7 @@ describe("/api", () => {
               .get("/api/articles/1/comments")
               .expect(200)
               .then(({ body }) => {
-                expect(body).to.have.length(13);
+                expect(body.comments).to.have.length(13);
               });
           });
           it("Status 200: returns an array of comment objects with only the correct keys", () => {
@@ -287,7 +287,7 @@ describe("/api", () => {
               .get("/api/articles/1/comments")
               .expect(200)
               .then(({ body }) => {
-                expect(body[0]).to.have.keys(
+                expect(body.comments[0]).to.have.keys(
                   "comment_id",
                   "votes",
                   "created_at",
@@ -296,12 +296,20 @@ describe("/api", () => {
                 );
               });
           });
+          it("Status 200: returns an object with an empty array when article has no comments", () => {
+            return request
+              .get("/api/articles/2/comments")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.comments).to.have.length(0);
+              });
+          });
           it("Status 200: returns an array of comments relating to an article sorted by created_at and descending by default", () => {
             return request
               .get("/api/articles/1/comments")
               .expect(200)
               .then(({ body }) => {
-                expect(body).to.be.descendingBy("created_at");
+                expect(body.comments).to.be.descendingBy("created_at");
               });
           });
           it("Status 200: returns an array of comments relating to an article sorted by created_at and and ascending", () => {
@@ -309,7 +317,7 @@ describe("/api", () => {
               .get("/api/articles/1/comments?order=asc")
               .expect(200)
               .then(({ body }) => {
-                expect(body).to.be.ascendingBy("created_at");
+                expect(body.comments).to.be.ascendingBy("created_at");
               });
           });
           it("Status 200: returns an array of comments relating to an article sorted by username and ascending", () => {
@@ -317,7 +325,7 @@ describe("/api", () => {
               .get("/api/articles/1/comments?sort_by=username&order=asc")
               .expect(200)
               .then(({ body }) => {
-                expect(body).to.be.ascendingBy("author");
+                expect(body.comments).to.be.ascendingBy("author");
               });
           });
           it("Status 200: ignores invalid query type", () => {
@@ -325,7 +333,7 @@ describe("/api", () => {
               .get("/api/articles/1/comments?not_a_query=author")
               .expect(200)
               .then(({ body }) => {
-                expect(body).to.have.length(13);
+                expect(body.comments).to.have.length(13);
               });
           });
           it("Status 400: returns an error when sort query is invalid", () => {
@@ -338,13 +346,13 @@ describe("/api", () => {
                 });
               });
           });
-          it("Status 400: returns an error when article doesn't exist", () => {
+          it("Status 404: returns an error when article doesn't exist", () => {
             return request
               .get("/api/articles/999/comments")
               .expect(404)
               .then(({ body }) => {
                 expect(body).to.eql({
-                  msg: "Bad request, article doesn't exist."
+                  msg: "Article not found."
                 });
               });
           });
@@ -383,7 +391,7 @@ describe("/api", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.have.length(12);
+            expect(body.articles).to.have.length(12);
           });
       });
       it("Status 200: returns an array of all articles sorted by created_at by default and descending", () => {
@@ -391,7 +399,7 @@ describe("/api", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.be.descendingBy("created_at");
+            expect(body.articles).to.be.descendingBy("created_at");
           });
       });
       it("Status 200: returns an array of all articles sorted by title and descending", () => {
@@ -399,7 +407,7 @@ describe("/api", () => {
           .get("/api/articles?sort_by=title")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.be.descendingBy("title");
+            expect(body.articles).to.be.descendingBy("title");
           });
       });
       it("Status 200: returns an array of all articles sorted by title and ascending", () => {
@@ -407,7 +415,7 @@ describe("/api", () => {
           .get("/api/articles?sort_by=title&order=asc")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.be.ascendingBy("title");
+            expect(body.articles).to.be.ascendingBy("title");
           });
       });
       it("Status 200: returns an array of all articles filtered by author", () => {
@@ -415,7 +423,7 @@ describe("/api", () => {
           .get("/api/articles?author=butter_bridge")
           .expect(200)
           .then(({ body }) => {
-            body.forEach(element => {
+            body.articles.forEach(element => {
               expect(element.author).to.equal("butter_bridge");
             });
           });
@@ -425,7 +433,7 @@ describe("/api", () => {
           .get("/api/articles?topic=mitch")
           .expect(200)
           .then(({ body }) => {
-            body.forEach(element => {
+            body.articles.forEach(element => {
               expect(element.topic).to.equal("mitch");
             });
           });
@@ -435,7 +443,7 @@ describe("/api", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            body.forEach(element => {
+            body.articles.forEach(element => {
               expect(element).to.have.keys(
                 "article_id",
                 "author",
@@ -454,7 +462,7 @@ describe("/api", () => {
           .get("/api/articles?order=not_an_order")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.be.descendingBy("created_at");
+            expect(body.articles).to.be.descendingBy("created_at");
           });
       });
       it("Status 200: returns an empty array when no articles exist for an author", () => {
@@ -462,7 +470,7 @@ describe("/api", () => {
           .get("/api/articles?author=lurker")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.eql([]);
+            expect(body.articles).to.eql([]);
           });
       });
       it("Status 400: returns an error when sort query is invalid", () => {
@@ -528,7 +536,7 @@ describe("/api", () => {
           .send({ inc_votes: 999 })
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.eql({
+            expect(body.comment).to.eql({
               article_id: 1,
               author: "icellusedkars",
               body:
@@ -545,7 +553,7 @@ describe("/api", () => {
           .send({ inc_votes: -999 })
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.eql({
+            expect(body.comment).to.eql({
               article_id: 1,
               author: "icellusedkars",
               body:

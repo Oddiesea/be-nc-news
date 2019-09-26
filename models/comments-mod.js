@@ -19,12 +19,19 @@ exports.getCommentsByArticle = ({
     .where({ article_id })
     .orderBy(sort_by, order)
     .then(commentsData => {
-      if (commentsData.length === 0)
-        return Promise.reject({
-          status: 404,
-          msg: "Bad request, article doesn't exist."
-        });
-      return commentsData
+      if (commentsData.length === 0) {
+        return connection("articles")
+          .select("*")
+          .where({ article_id })
+          .then(articleData => {
+            if (articleData.length === 0) {
+              return Promise.reject({
+                status: 404,
+                msg: "Article not found."
+              });
+            } else return commentsData;
+          });
+      } else return commentsData;
     });
 };
 
@@ -48,12 +55,13 @@ exports.patchCommentVotes = ({
     });
 };
 
-exports.deleteCommentById = ({params: {comment_id}})=> {
-  return connection('comments')
-  .where({ comment_id })
-  .del()
-  .returning('*').then(([commentData]) => {
-    if (commentData === undefined)
-      return Promise.reject({ status: 404, msg: "Comment not found." });
-  });
-}
+exports.deleteCommentById = ({ params: { comment_id } }) => {
+  return connection("comments")
+    .where({ comment_id })
+    .del()
+    .returning("*")
+    .then(([commentData]) => {
+      if (commentData === undefined)
+        return Promise.reject({ status: 404, msg: "Comment not found." });
+    });
+};
