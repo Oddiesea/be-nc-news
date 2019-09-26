@@ -11,7 +11,7 @@ const connection = require("../db/connection");
 beforeEach(() => connection.seed.run());
 after(() => connection.destroy());
 
-describe("Errors", () => {
+describe("General Errors", () => {
   it("Status 404: page not found", () => {
     return request
       .get("/ap0/topics")
@@ -320,6 +320,14 @@ describe("/api", () => {
                 expect(body).to.be.ascendingBy("author");
               });
           });
+          it("Status 200: ignores invalid query type", () => {
+            return request
+              .get("/api/articles/1/comments?not_a_query=author")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body).to.have.length(13);
+              });
+          });
           it("Status 400: returns an error when sort query is invalid", () => {
             return request
               .get("/api/articles/1/comments?sort_by=not_a_column")
@@ -383,7 +391,7 @@ describe("/api", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.be.descendingBy('created_at');
+            expect(body).to.be.descendingBy("created_at");
           });
       });
       it("Status 200: returns an array of all articles sorted by title and descending", () => {
@@ -391,7 +399,7 @@ describe("/api", () => {
           .get("/api/articles?sort_by=title")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.be.descendingBy('title');
+            expect(body).to.be.descendingBy("title");
           });
       });
       it("Status 200: returns an array of all articles sorted by title and ascending", () => {
@@ -399,7 +407,7 @@ describe("/api", () => {
           .get("/api/articles?sort_by=title&order=asc")
           .expect(200)
           .then(({ body }) => {
-            expect(body).to.be.ascendingBy('title');
+            expect(body).to.be.ascendingBy("title");
           });
       });
       it("Status 200: returns an array of all articles filtered by author", () => {
@@ -407,9 +415,9 @@ describe("/api", () => {
           .get("/api/articles?author=butter_bridge")
           .expect(200)
           .then(({ body }) => {
-            body.forEach((element) => {
-              expect(element.author).to.equal('butter_bridge');
-            })
+            body.forEach(element => {
+              expect(element.author).to.equal("butter_bridge");
+            });
           });
       });
       it("Status 200: returns an array of all articles filtered by topic", () => {
@@ -417,9 +425,9 @@ describe("/api", () => {
           .get("/api/articles?topic=mitch")
           .expect(200)
           .then(({ body }) => {
-            body.forEach((element) => {
-              expect(element.topic).to.equal('mitch');
-            })
+            body.forEach(element => {
+              expect(element.topic).to.equal("mitch");
+            });
           });
       });
       it("Status 200: returns an array of objects with the correct keys", () => {
@@ -427,10 +435,203 @@ describe("/api", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            body.forEach((element) => {
-              expect(element).to.have.keys("article_id","author","body","comment_count","created_at","title","topic","votes");
-            })
+            body.forEach(element => {
+              expect(element).to.have.keys(
+                "article_id",
+                "author",
+                "body",
+                "comment_count",
+                "created_at",
+                "title",
+                "topic",
+                "votes"
+              );
+            });
           });
+      });
+      it("Status 200: defaults to desc when given invlaid order query value", () => {
+        return request
+          .get("/api/articles?order=not_an_order")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).to.be.descendingBy("created_at");
+          });
+      });
+      it("Status 200: returns an empty array when no articles exist for an author", () => {
+        return request
+          .get("/api/articles?author=lurker")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).to.eql([]);
+          });
+      });
+      it("Status 400: returns an error when sort query is invalid", () => {
+        return request
+          .get("/api/articles?sort_by=not_a_column")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({
+              msg: "Bad request , references an invalid column."
+            });
+          });
+      });
+      it("Status 400: returns an error when sort query is invalid", () => {
+        return request
+          .get("/api/articles?sort_by=not_a_column")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({
+              msg: "Bad request , references an invalid column."
+            });
+          });
+      });
+      it("Status 404: returns an error when filter author doesn't exist", () => {
+        return request
+          .get("/api/articles?author=not_a_user")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({
+              msg: "Article not found."
+            });
+          });
+      });
+      it("Status 404: returns an error when topic filter query is invalid", () => {
+        return request
+          .get("/api/articles?topic=1000")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({
+              msg: "Article not found."
+            });
+          });
+      });
+    });
+    describe("Disallowed Methods", () => {
+      it("Status 405: returns method not allowed for all but get method", () => {
+        const dissalllowedMethods = ["post", "patch", "delete"];
+        dissalllowedMethods.map(method => {
+          return request[method]("/api/articles")
+            .expect(405)
+            .then(({ body }) => {
+              expect(body).to.eql({ msg: "Method not allowed." });
+            });
+        });
+        return Promise.all(dissalllowedMethods);
+      });
+    });
+  });
+  describe("/comments", () => {
+    describe("PATCH", () => {
+      it("Status 200: increments vote by passed item", () => {
+        return request
+          .patch("/api/comments/3")
+          .send({ inc_votes: 999 })
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).to.eql({
+              article_id: 1,
+              author: "icellusedkars",
+              body:
+                "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+              comment_id: 3,
+              created_at: "2015-11-23T12:36:03.389Z",
+              votes: 1099
+            });
+          });
+      });
+      it("Status 200: returns an object containing the updated vote count decremented", () => {
+        return request
+          .patch("/api/comments/3")
+          .send({ inc_votes: -999 })
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).to.eql({
+              article_id: 1,
+              author: "icellusedkars",
+              body:
+                "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+              comment_id: 3,
+              created_at: "2015-11-23T12:36:03.389Z",
+              votes: -899
+            });
+          });
+      });
+      it("Status 400: returns error when route is non-integer value", () => {
+        return request
+          .patch("/api/comments/twenty")
+          .send({ inc_votes: 999 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Invalid input integer expected." });
+          });
+      });
+      it("Status 400: returns error when passed an object without the correct key", () => {
+        return request
+          .patch("/api/comments/3")
+          .send({ votes: 1 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({
+              msg: "Bad request, invalid update object"
+            });
+          });
+      });
+      it("Status 400: returns error when passed an object with a non integer value", () => {
+        return request
+          .patch("/api/comments/3")
+          .send({ inc_votes: "one hundred" })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Invalid input integer expected." });
+          });
+      });
+      it("Status 404: returns error when article doesn't exist", () => {
+        return request
+          .patch("/api/comments/999")
+          .send({ inc_votes: 999 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Comment not found." });
+          });
+      });
+    });
+    describe("DELETE", () => {
+      it("Status 204: deletes comment and sends 204 response", () => {
+        return request
+          .delete("/api/comments/1")
+          .expect(204)
+          .then(({ body }) => {
+            expect(body).to.eql({});
+          });
+      });
+      it("Status 400: returns error when comment number is invalid ", () => {
+        return request
+          .delete("/api/comments/two")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Invalid input integer expected." });
+          });
+      });
+      it("Status 404: returns error when comment doesn't exist", () => {
+        return request
+          .delete("/api/comments/999")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Comment not found." });
+          });
+      });
+    });
+    describe("Disallowed Methods", () => {
+      it("Status 405: returns method not allowed for all but delete and patch methods", () => {
+        const dissalllowedMethods = ["get", "post"];
+        dissalllowedMethods.map(method => {
+          return request[method]("/api/comments/1")
+            .expect(405)
+            .then(({ body }) => {
+              expect(body).to.eql({ msg: "Method not allowed." });
+            });
+        });
+        return Promise.all(dissalllowedMethods);
       });
     });
   });

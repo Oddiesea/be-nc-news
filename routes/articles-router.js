@@ -10,7 +10,10 @@ const {
 } = require("../controllers/comments-cont");
 const { handle405Errors } = require("../errors/errors");
 
-articlesRouter.route("/").get(requestAllArticles);
+articlesRouter
+  .route("/")
+  .get(requestAllArticles)
+  .all(handle405Errors);
 
 articlesRouter
   .route("/:article_id")

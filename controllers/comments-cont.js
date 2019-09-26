@@ -1,4 +1,9 @@
-const { postComment, getCommentsByArticle } = require("../models/comments-mod");
+const {
+  postComment,
+  getCommentsByArticle,
+  patchCommentVotes,
+  deleteCommentById
+} = require("../models/comments-mod");
 
 exports.sendComment = (req, res, next) => {
   postComment(req)
@@ -11,12 +16,23 @@ exports.sendComment = (req, res, next) => {
 exports.requestCommentsByArticle = (req, res, next) => {
   getCommentsByArticle(req)
     .then(commentsData => {
-      if (commentsData.length === 0)
-        return Promise.reject({
-          status: 404,
-          msg: "Bad request, article doesn't exist."
-        });
       res.status(200).send(commentsData);
+    })
+    .catch(next);
+};
+
+exports.updateCommentVotes = (req, res, next) => {
+  patchCommentVotes(req)
+    .then(commentData => {
+      res.status(200).send(commentData);
+    })
+    .catch(next);
+};
+
+exports.removeCommentById = (req, res, next) => {
+  deleteCommentById(req)
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };
