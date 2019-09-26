@@ -1,4 +1,5 @@
 const ENV = process.env.NODE_ENV || "development";
+const { DB_URL } = process.env;
 
 const baseConfig = {
   client: "pg",
@@ -26,7 +27,7 @@ const customConfig = {
     }
   },
   production: {
-    connection: process.env.DATABASE_URL
+    connection: `${DB_URL}?ssl=true`,
   }
 };
 
