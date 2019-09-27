@@ -5,6 +5,7 @@ exports.getArticles = ({
   query: { sort_by = "created_at", order, author, topic }
 }) => {
   let testArr = [];
+  let queryCorrect = true;
   order === "asc" ? (order = "asc") : (order = "desc");
   return connection("articles")
     .select("articles.*")
@@ -22,49 +23,19 @@ exports.getArticles = ({
         if (author) testArr.push(["users", "username", author]);
         if (topic) testArr.push(["topics", "slug", topic]);
 
-        
-        
+        if (testArr.length === 0) return Promise.reject({ status: 404, msg: "Article not found." })
+
         testArr = testArr.map(testElem => {
-        return connection(testElem[0])
-          .select("*")
-          .where(testElem[1], testElem[2])
-          // .then(data => data)
-
-
-
-          // return await connection(testElem[0])
-          //   .select("*")
-          //   .where(testElem[1], testElem[2])
-            // .then(data => data)
-        
-
-            //   if (data.length === 0)
-            //     return Promise.reject({
-            //       status: 404,
-            //       msg: "Items not found."
-            //     });
-            //   else return Promise.resolve();
-            // });
+          return genericSelect(testElem).catch();
         });
 
-        return Promise.all(testArr).then(resultArr=> {
-          console.log(resultArr);
-        }).catch(console.log('here'))
-
-        //   if (author) {
-        //     return connection("users")
-        //       .select("*")
-        //       .where("username", author)
-        //       .then(authorData => {
-        //         if (authorData.length === 0) {
-        //           return Promise.reject({
-        //             status: 404,
-        //             msg: "Article not found."
-        //           });
-        //         } else return articleData;
-        //       });
-        //   } else
-        //     return Promise.reject({ status: 404, msg: "Article not found." });
+        return Promise.all(testArr)
+          .then(resultArr => {
+            return resultArr.find(result=> result.length === 0)
+              ? Promise.reject({ status: 404, msg: "Article not found." })
+              : articleData;
+          })
+          .catch();
       } else return articleData;
     });
 };
@@ -88,4 +59,10 @@ exports.patchArticleVotes = ({
           return Promise.reject({ status: 404, msg: "Article not found." });
         return articleData;
       });
+};
+
+const genericSelect = testArr => {
+  return connection(testArr[0])
+    .select("*")
+    .where(testArr[1], testArr[2]);
 };

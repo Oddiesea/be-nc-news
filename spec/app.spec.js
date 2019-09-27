@@ -257,20 +257,18 @@ describe("/api", () => {
               });
           });
           it("Status 422: returns error when the username doesn't exist in users table", () => {
-            return (
-              request
-                .post("/api/articles/1/comments")
-                .send({
-                  username: "fake_user123",
-                  body: "This is a test body."
-                })
-                .expect(422)
-                .then(({ body }) => {
-                  expect(body).to.eql({
-                    msg: "Unprocessable entity , references non-existent item"
-                  });
-                })
-            );
+            return request
+              .post("/api/articles/1/comments")
+              .send({
+                username: "fake_user123",
+                body: "This is a test body."
+              })
+              .expect(422)
+              .then(({ body }) => {
+                expect(body).to.eql({
+                  msg: "Unprocessable entity , references non-existent item"
+                });
+              });
           });
         });
         describe("GET", () => {
@@ -438,17 +436,6 @@ describe("/api", () => {
             });
           });
       });
-      it.only("Status 200: returns an array of all articles filtered by topic and author", () => {
-        return request
-          .get("/api/articles?topic=motch&author=butter_brodge")
-          .expect(200)
-          .then(({ body }) => {
-            body.articles.forEach(element => {
-              expect(element.topic).to.equal("mitch");
-              expect(element.author).to.equal("butter_bridge");          
-            });
-          });
-      });
       it("Status 200: returns an array of objects with the correct keys", () => {
         return request
           .get("/api/articles")
@@ -467,15 +454,15 @@ describe("/api", () => {
               );
             });
           });
-      });
+        });
       it("Status 200: defaults to desc when given invlaid order query value", () => {
         return request
-          .get("/api/articles?order=not_an_order")
+        .get("/api/articles?order=not_an_order")
           .expect(200)
           .then(({ body }) => {
             expect(body.articles).to.be.descendingBy("created_at");
           });
-      });
+        });
       it("Status 200: returns an empty array when no articles exist for an author", () => {
         return request
           .get("/api/articles?author=lurker")
@@ -483,7 +470,7 @@ describe("/api", () => {
           .then(({ body }) => {
             expect(body.articles).to.eql([]);
           });
-      });
+        });
       it("Status 400: returns an error when sort query is invalid", () => {
         return request
           .get("/api/articles?sort_by=not_a_column")
@@ -493,7 +480,7 @@ describe("/api", () => {
               msg: "Bad request , references an invalid column."
             });
           });
-      });
+        });
       it("Status 400: returns an error when sort query is invalid", () => {
         return request
           .get("/api/articles?sort_by=not_a_column")
@@ -503,7 +490,15 @@ describe("/api", () => {
               msg: "Bad request , references an invalid column."
             });
           });
-      });
+        });
+        it("Status 404: returns an error when filter topic doesn't exist", () => {
+          return request
+            .get("/api/articles?topic=motch&author=butter_bridge")
+            .expect(404)
+            .then(({ body }) => {
+              expect(body).to.eql({ msg: "Article not found." });
+            });
+        });
       it("Status 404: returns an error when filter author doesn't exist", () => {
         return request
           .get("/api/articles?author=not_a_user")
@@ -513,7 +508,7 @@ describe("/api", () => {
               msg: "Article not found."
             });
           });
-      });
+        });
       it("Status 404: returns an error when topic filter query is invalid", () => {
         return request
           .get("/api/articles?topic=1000")

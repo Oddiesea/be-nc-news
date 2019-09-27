@@ -8,12 +8,11 @@ const {
   handle500Errors
 } = require("./errors/errors");
 
-//midleware
 app.use(express.json());
-//routing
+
 app.use("/api", apiRouter);
 app.all("/*", handle404Errors);
-//error handlers
+
 app.use(handleCustomErrors);
 app.use(handleCustomPSQLErrors);
 app.use(handle500Errors);
