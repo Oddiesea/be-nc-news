@@ -438,6 +438,17 @@ describe("/api", () => {
             });
           });
       });
+      it.only("Status 200: returns an array of all articles filtered by topic and author", () => {
+        return request
+          .get("/api/articles?topic=motch&author=butter_brodge")
+          .expect(200)
+          .then(({ body }) => {
+            body.articles.forEach(element => {
+              expect(element.topic).to.equal("mitch");
+              expect(element.author).to.equal("butter_bridge");          
+            });
+          });
+      });
       it("Status 200: returns an array of objects with the correct keys", () => {
         return request
           .get("/api/articles")

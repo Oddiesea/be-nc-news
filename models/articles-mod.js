@@ -4,6 +4,7 @@ exports.getArticles = ({
   params: { article_id },
   query: { sort_by = "created_at", order, author, topic }
 }) => {
+  let testArr = [];
   order === "asc" ? (order = "asc") : (order = "desc");
   return connection("articles")
     .select("articles.*")
@@ -18,20 +19,52 @@ exports.getArticles = ({
     })
     .then(articleData => {
       if (articleData.length === 0) {
-        if (author) {
-          return connection("users")
-            .select("*")
-            .where("username", author)
-            .then(authorData => {
-              if (authorData.length === 0) {
-                return Promise.reject({
-                  status: 404,
-                  msg: "Article not found."
-                });
-              } else return articleData;
-            });
-        } else
-          return Promise.reject({ status: 404, msg: "Article not found." });
+        if (author) testArr.push(["users", "username", author]);
+        if (topic) testArr.push(["topics", "slug", topic]);
+
+        
+        
+        testArr = testArr.map(testElem => {
+        return connection(testElem[0])
+          .select("*")
+          .where(testElem[1], testElem[2])
+          // .then(data => data)
+
+
+
+          // return await connection(testElem[0])
+          //   .select("*")
+          //   .where(testElem[1], testElem[2])
+            // .then(data => data)
+        
+
+            //   if (data.length === 0)
+            //     return Promise.reject({
+            //       status: 404,
+            //       msg: "Items not found."
+            //     });
+            //   else return Promise.resolve();
+            // });
+        });
+
+        return Promise.all(testArr).then(resultArr=> {
+          console.log(resultArr);
+        }).catch(console.log('here'))
+
+        //   if (author) {
+        //     return connection("users")
+        //       .select("*")
+        //       .where("username", author)
+        //       .then(authorData => {
+        //         if (authorData.length === 0) {
+        //           return Promise.reject({
+        //             status: 404,
+        //             msg: "Article not found."
+        //           });
+        //         } else return articleData;
+        //       });
+        //   } else
+        //     return Promise.reject({ status: 404, msg: "Article not found." });
       } else return articleData;
     });
 };
