@@ -26,7 +26,7 @@ exports.getArticles = ({
         if (testArr.length === 0) return Promise.reject({ status: 404, msg: "Article not found." })
 
         testArr = testArr.map(testElem => {
-          return genericSelect(testElem).catch();
+          return genericSelect(testElem);
         });
 
         return Promise.all(testArr)

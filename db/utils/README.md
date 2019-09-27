@@ -1,39 +1,93 @@
-# Utility Functions
+# Be-NC-News
 
-You should employ full TDD as you build these functions.
+Be-NC-News is a Back-end node.js app for implementing our NC-News project server. 
 
-If you need extra guidance refer back to your schema in the migrations files and look at how the data provided differs from the structure set out in the schema.
+## Getting Started
 
----
+The following inscructions will get you up and running with your own instance of the Be-NC-News API.
 
-## formatDate
+### Prerequisites
 
-This utility function should be able to take an array (`list`) of objects and return a new array. Each item in the new array must have its timestamp converted into a Javascript date object. Everything else in each item must be maintained.
 
-_hint: Think carefully about how you can test that this has worked - it's not by copying and pasting a sql timestamp from the terminal into your test_
+```
+Node.js
+NPM
+A PSQL Instance 
+```
 
----
+### Installing
 
-## makeRefObj
+To install follow these steps
 
-This utility function should be able to take an array (`list`) of objects and return a reference object. The reference object must be keyed by each item's title, with the values being each item's corresponding id. e.g.
+Set up your PSQL database and update the knexfile.js with the relevant settings
 
-`[{ article_id: 1, title: 'A' }]`
+```
+connection: {
+      database: "database_name",
+      username: "username",
+      password: "password"
+```
 
-will become
+Run npm to install dependencies 
 
-`{ A: 1 }`
+```
+npm install
+```
 
----
+End with an example of getting some data out of the system or using it for a little demo
 
-## formatComments
+------------
+## Running the tests
 
-This utility function should be able to take an array of comment objects (`comments`) and a reference object, and return a new array of formatted comments.
+Mocha, chai and supertest are used for testing. Find the test files in the `spec` folder. 
 
-Each formatted comment must have:
+### Util tests
 
-- Its `created_by` property renamed to an `author` key
-- Its `belongs_to` property renamed to an `article_id` key
-- The value of the new `article_id` key must be the id corresponding to the original title value provided
-- Its `created_at` value converted into a javascript date object
-- The rest of the comment's properties must be maintained
+These test our utility functions for seeding the database.
+
+```
+npm run util-test
+```
+
+### App tests
+
+These test our endpoints and queries.
+
+```
+npm test
+```
+
+## Deployment
+
+Add additional notes about how to deploy this on a live system
+
+
+------------
+
+## Built With
+
+* [Node.js](http://nodejs.com) - 
+* [Express](http://www.dropwizard.io/1.0.2/docs/) - Web Framework
+* [NPM](https://www.npmjs.com) - Dependency Management
+* [KNEX](http://knexjs.org) - ORM / SQL Query Builder 
+* [node-postgres](https://node-postgres.com/) - Postgres Client
+
+## Contributing
+
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+
+## Authors
+
+* **Liam Wilton-Jones** - *Initial work* - [PurpleBooth](https://github.com/Oddiesea)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+* Northcoders Team, for their continued support.
