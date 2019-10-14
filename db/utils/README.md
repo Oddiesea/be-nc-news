@@ -59,8 +59,7 @@ npm test
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
-
+The npm scripts were written with the intetion of being deployed to heroku, these will need amending if you plan on hosting this server elsewhere.
 
 ------------
 
