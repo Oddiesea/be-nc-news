@@ -10,3 +10,11 @@ exports.getUserByUsername = ({ params: { username } }) => {
       return userData;
     });
 };
+
+exports.getAllUsers = () => {
+  return connection("users")
+    .select("*")
+    .then(allUsers => {
+     return {users:allUsers};
+    });
+};

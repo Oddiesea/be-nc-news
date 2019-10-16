@@ -57,6 +57,31 @@ describe("/api", () => {
     });
   });
   describe("/users", () => {
+    describe("/", () => {
+      describe("GET", () => {
+        it("Status 200: returns all user data in an array of correct length", () => {
+          return request
+            .get("/api/users/")
+            .expect(200)
+            .then(({ body: { users } }) => {
+              expect(users.length).to.equal(4);
+            });
+        });
+      });
+    });
+    describe("Disallowed Methods", () => {
+      it("Status 405: returns method not allowed for all but get method", () => {
+        const dissalllowedMethods = ["patch", "post", "delete"];
+        dissalllowedMethods.map(method => {
+          return request[method]("/api/users/")
+            .expect(405)
+            .then(({ body }) => {
+              expect(body).to.eql({ msg: "Method not allowed." });
+            });
+        });
+        return Promise.all(dissalllowedMethods);
+      });
+    });
     describe("/:username", () => {
       describe("GET", () => {
         it("Status 200: returns user data object when passed correct username as parametic", () => {
@@ -454,15 +479,15 @@ describe("/api", () => {
               );
             });
           });
-        });
+      });
       it("Status 200: defaults to desc when given invlaid order query value", () => {
         return request
-        .get("/api/articles?order=not_an_order")
+          .get("/api/articles?order=not_an_order")
           .expect(200)
           .then(({ body }) => {
             expect(body.articles).to.be.descendingBy("created_at");
           });
-        });
+      });
       it("Status 200: returns an empty array when no articles exist for an author", () => {
         return request
           .get("/api/articles?author=lurker")
@@ -470,7 +495,7 @@ describe("/api", () => {
           .then(({ body }) => {
             expect(body.articles).to.eql([]);
           });
-        });
+      });
       it("Status 400: returns an error when sort query is invalid", () => {
         return request
           .get("/api/articles?sort_by=not_a_column")
@@ -480,7 +505,7 @@ describe("/api", () => {
               msg: "Bad request , references an invalid column."
             });
           });
-        });
+      });
       it("Status 400: returns an error when sort query is invalid", () => {
         return request
           .get("/api/articles?sort_by=not_a_column")
@@ -490,15 +515,15 @@ describe("/api", () => {
               msg: "Bad request , references an invalid column."
             });
           });
-        });
-        it("Status 404: returns an error when filter topic doesn't exist", () => {
-          return request
-            .get("/api/articles?topic=motch&author=butter_bridge")
-            .expect(404)
-            .then(({ body }) => {
-              expect(body).to.eql({ msg: "Article not found." });
-            });
-        });
+      });
+      it("Status 404: returns an error when filter topic doesn't exist", () => {
+        return request
+          .get("/api/articles?topic=motch&author=butter_bridge")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).to.eql({ msg: "Article not found." });
+          });
+      });
       it("Status 404: returns an error when filter author doesn't exist", () => {
         return request
           .get("/api/articles?author=not_a_user")
@@ -508,7 +533,7 @@ describe("/api", () => {
               msg: "Article not found."
             });
           });
-        });
+      });
       it("Status 404: returns an error when topic filter query is invalid", () => {
         return request
           .get("/api/articles?topic=1000")

@@ -1,4 +1,4 @@
-const { getUserByUsername } = require("../models/users-mod");
+const { getUserByUsername, getAllUsers } = require("../models/users-mod");
 
 exports.requestUserByUsername = (req, res, next) => {
   getUserByUsername(req)
@@ -7,3 +7,10 @@ exports.requestUserByUsername = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.requestAllUsers = (req, res, next) => {
+  getAllUsers().then(allUsers => {
+    res.status(200).send(allUsers);
+  }).catch(next);
+}
+    
